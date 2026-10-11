@@ -1,0 +1,40 @@
+﻿services:
+  web:
+    build: .
+    ports: ["8080:80"]
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8080
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: tamca
+      DB_USERNAME: tamca
+      DB_PASSWORD: local_secret
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+    volumes:
+      - ./app:/var/www/html
+      - vendor:/var/www/html/vendor
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: tamca
+      MYSQL_USER: tamca
+      MYSQL_PASSWORD: local_secret
+      MYSQL_ROOT_PASSWORD: root_local_secret
+    ports: ["3307:3306"]
+    volumes: ["mysql_data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  vendor:
+  mysql_data:
