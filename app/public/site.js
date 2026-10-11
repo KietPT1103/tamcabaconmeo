@@ -7,6 +7,18 @@ filters.forEach(button=>button.addEventListener('click',()=>{category=button.dat
 search?.addEventListener('input',filterProducts);
 document.querySelector('.search-toggle')?.addEventListener('click',()=>{document.querySelector('.search-box').hidden=false;document.querySelector('#demo').scrollIntoView({behavior:'smooth'});search.focus()});
 document.querySelector('.show-all')?.addEventListener('click',()=>{search.value='';filters[0].click();document.querySelector('.product-grid').scrollIntoView({behavior:'smooth'})});
-const track=document.querySelector('.project-track');
-document.querySelector('.slider-next')?.addEventListener('click',()=>track.scrollBy({left:track.clientWidth*.8,behavior:'smooth'}));
-document.querySelector('.slider-prev')?.addEventListener('click',()=>track.scrollBy({left:-track.clientWidth*.8,behavior:'smooth'}));
+// Progressive enhancement: visible without JS; respects reduced motion.
+if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const workObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('work-enter');
+                workObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.work-piece').forEach(piece => {
+        piece.classList.add('work-enter');
+        workObserver.observe(piece);
+    });
+}
